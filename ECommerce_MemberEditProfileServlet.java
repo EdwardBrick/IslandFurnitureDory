@@ -51,7 +51,7 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
         String email = (String) request.getParameter("email");
 
         //Bonus Marks: Change Password
-//        String password = (String) request.getParameter("password");
+        String password = (String) request.getParameter("password");
 
         //Using form information to change member session information
 //        updatedMember.setName(name);
@@ -79,7 +79,9 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
                 .queryParam("securityAnswer", securityAnswer)
                 .queryParam("age", age)
                 .queryParam("income", income)
-                .queryParam("email", email);
+                .queryParam("email", email)
+                //Bonus Marks: Change Password
+                .queryParam("password", password);
 
         Invocation.Builder invocationBuilder1 = target1.request(MediaType.APPLICATION_JSON);
         Response res1 = invocationBuilder1.put(Entity.entity(updatedMember, MediaType.APPLICATION_JSON));

@@ -121,7 +121,8 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
                     member.setLoyaltyPoints(rs.getInt("LoyaltyPoints"));
                     member.setCumulativeSpending(rs.getDouble("CumulativeSpending"));
 
-                    GenericEntity<Member> entity = new GenericEntity<Member>(member) {};
+                    GenericEntity<Member> entity = new GenericEntity<Member>(member) {
+                    };
                     return Response.status(200).entity(entity).build();
                 }
                 conn.close();
@@ -143,13 +144,24 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
     public Response editProfile(@QueryParam("name") String name, @QueryParam("phone") String phone, @QueryParam("city") String city,
             @QueryParam("address") String address, @QueryParam("securityQuestion") String securityQuestion,
             @QueryParam("securityAnswer") String securityAnswer, @QueryParam("age") String age,
-            @QueryParam("income") String income, @QueryParam("email") String email) throws SQLException {
+            @QueryParam("income") String income, @QueryParam("email") String email,
+            //Bonus Marks: Change Password
+            @QueryParam("password") String password) throws SQLException {
 
+        String passwordSalt = generatePasswordSalt();
+        String passwordHash = generatePasswordHash(passwordSalt, password);
+        String sql = "";
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/islandfurniture-it07", "root", "12345");
-            String sql = "UPDATE memberentity SET name = ?, phone = ?, city = ?, address = ?, securityQuestion = ?, securityAnswer = ?, "
-                         + "age = ?, income = ? WHERE email = ?";
+            if (password.isEmpty()) {
+                sql = "UPDATE memberentity SET name = ?, phone = ?, city = ?, address = ?, securityQuestion = ?, securityAnswer = ?, "
+                        + "age = ?, income = ? WHERE email = ?";
+
+            } else {
+                sql = "UPDATE memberentity SET name = ?, phone = ?, city = ?, address = ?, securityQuestion = ?, securityAnswer = ?, "
+                        + "age = ?, income = ?, passwordhash = ?, passwordsalt = ? WHERE email = ?";
+            }
 
             try {
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -162,7 +174,13 @@ public class MemberentityFacadeREST extends AbstractFacade<Memberentity> {
                 ps.setString(7, age);
                 ps.setString(8, income);
 
-                ps.setString(9, email);
+                if (password.isEmpty()) {
+                    ps.setString(9, email);
+                } else {
+                    ps.setString(9, passwordHash);
+                    ps.setString(10, passwordSalt);
+                    ps.setString(11, email);
+                }
 
                 ps.executeUpdate();
                 System.out.println("updatedData");
