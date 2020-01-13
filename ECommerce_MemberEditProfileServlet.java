@@ -43,6 +43,9 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
         String name = (String) request.getParameter("name");
         String phone = (String) request.getParameter("phone");
         String city = (String) request.getParameter("country");
+        if (city == null) {
+                    System.out.println("empty city");
+                }
         String address = (String) request.getParameter("address");
         int securityQuestion = Integer.parseInt(request.getParameter("securityQuestion"));
         String securityAnswer = (String) request.getParameter("securityAnswer");
@@ -101,7 +104,7 @@ public class ECommerce_MemberEditProfileServlet extends HttpServlet {
             session.setAttribute("member", updatedMemberData);
             session.setAttribute("memberName", updatedMemberData.getName());
 
-            response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp");
+            response.sendRedirect("/IS3102_Project-war/B/SG/memberProfile.jsp?goodMsg=Account%20updated%20successfully.");
         } else {
             out.println("Update failed, please try again!");
         }
